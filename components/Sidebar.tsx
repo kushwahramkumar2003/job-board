@@ -1,12 +1,11 @@
 import { useState, useEffect, ChangeEvent } from "react";
-import { getJobs } from "@/actions/job";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Job } from "@prisma/client";
 
 interface SidebarProps {
-    setJobs: (jobs: Job[]) => void;
+    setFilters: (filters: any) => void;
+    setPage: (page: number) => void;
     setLoading: (value: boolean) => void;
 }
 
@@ -30,8 +29,8 @@ const formatSalary = (value: number, currency: string) => {
     return `${formattedValue} ${unit}`;
 };
 
-const Sidebar = ({ setJobs, setLoading }: SidebarProps) => {
-    const [filters, setFilters] = useState<Filters>({
+const Sidebar = ({ setFilters, setPage, setLoading }: SidebarProps) => {
+    const [filters, setLocalFilters] = useState<Filters>({
         title: "",
         companyName: "",
         location: "",
@@ -40,32 +39,22 @@ const Sidebar = ({ setJobs, setLoading }: SidebarProps) => {
     });
 
     const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFilters({
+        setLocalFilters({
             ...filters,
             [e.target.name]: e.target.value,
         });
     };
 
     const handleSliderChange = (value: [number, number]) => {
-        setFilters({
+        setLocalFilters({
             ...filters,
             salRange: value,
         });
     };
 
-    const fetchJobs = async () => {
-        setLoading(true);
-        //@ts-ignore
-        const response = await getJobs(filters);
-        if (response.status === "success") {
-            //@ts-ignore
-            setJobs(response.data);
-        }
-        setLoading(false);
-    };
-
     useEffect(() => {
-        fetchJobs();
+        setFilters(filters);
+        setPage(1); // Reset to first page when filters change
     }, [filters]);
 
     return (
@@ -89,7 +78,7 @@ const Sidebar = ({ setJobs, setLoading }: SidebarProps) => {
 
                 <Select
                     onValueChange={(value) => {
-                        setFilters({
+                        setLocalFilters({
                             ...filters,
                             currency: value,
                         });
@@ -106,7 +95,7 @@ const Sidebar = ({ setJobs, setLoading }: SidebarProps) => {
 
                 <Select
                     onValueChange={(value) => {
-                        setFilters({
+                        setLocalFilters({
                             ...filters,
                             location: value,
                         });
