@@ -6,10 +6,11 @@ import Sidebar from "@/components/Sidebar";
 import { cn } from "@/lib/utils";
 import { getJobs } from "@/actions/job";
 import { Job } from "@prisma/client";
+import {JobCardSkeleton} from "@/components/JobCardSkeleton";
 
 const JobsPage = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchJobs = async () => {
@@ -47,7 +48,10 @@ const JobsPage = () => {
                     )}
                 >
                     {loading ? (
-                        <h3 className="text-2xl font-semibold text-gray-800">Loading...</h3>
+                        [0,1,2,3,4].map((index)=>
+                            <JobCardSkeleton key={index+100}/>
+                        )
+                        // <h3 className="text-2xl font-semibold text-gray-800">Loading...</h3>
                     ) : jobs.length === 0 ? (
                         <h3 className="text-2xl font-semibold text-gray-800">No Jobs Found!</h3>
                     ) : (
